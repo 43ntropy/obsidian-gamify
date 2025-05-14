@@ -1,5 +1,7 @@
 import { App } from "obsidian";
 import { ViewDashboard } from "./view/Dashboard";
+import { ViewConfiguration } from "./view/Configuration";
+import Gamify from "main";
 
 export class GamifyController {
 
@@ -14,11 +16,32 @@ export class GamifyController {
                                 resolve(GamifyControllerState.CONFIGURE);
                             },
                             onQuit: () => {
-                                console.log("Dashboard closed");
                                 resolve(GamifyControllerState.CLOSE);
                             }
                         });
                     });
+                    break;
+                }
+
+                case GamifyControllerState.CONFIGURE: {
+                    state = await new Promise<GamifyControllerState>((resolve) => {
+                        const modal = new ViewConfiguration({
+                            onQuit: () => {
+                                resolve(GamifyControllerState.CLOSE);
+                            },
+                            onApply: () => {
+                                Gamify.DATA.save();
+                                resolve(GamifyControllerState.DASHBOARD);
+                            },
+                            onClickManageRewards: () => {
+                                resolve(GamifyControllerState.CONFIGURE_REWARDS);
+                            }
+                        });
+                    });
+                    break;
+                }
+
+                case GamifyControllerState.CONFIGURE_REWARDS: {
                     break;
                 }
 
@@ -27,7 +50,7 @@ export class GamifyController {
                     state = GamifyControllerState.CLOSE;
                     break;
                 }
-            }
+            } 
         } while (state != GamifyControllerState.CLOSE);
     }
 }
@@ -35,5 +58,6 @@ export class GamifyController {
 enum GamifyControllerState {
     DASHBOARD,
     CONFIGURE,
+    CONFIGURE_REWARDS,
     CLOSE
 }

@@ -1,5 +1,5 @@
 import Gamify from "main";
-import { App, Modal, MomentFormatComponent, Setting } from "obsidian";
+import { Modal, Setting } from "obsidian";
 
 export class ViewDashboard extends Modal {
 
