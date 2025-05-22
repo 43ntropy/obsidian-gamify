@@ -9,7 +9,7 @@ export class GamifyData {
 
     userPoints: number = 0;
 
-    rewards: GamifyDataReward[] = [];
+    rewards: (GamifyDataRewardFolder | GamifyDataReward)[] = [];
 
     private constructor(instance: Gamify, data: GamifyDataFile) {
         this.instance = instance;
@@ -36,8 +36,15 @@ export class GamifyData {
 
 }
 
+export interface GamifyDataRewardFolder {
+    name: string;
+    icon: string | null;
+    contents: GamifyDataReward[];
+}
+
 export interface GamifyDataReward {
     name: string;
+    icon: string | null;
     description: string;
     points: number;
     last_usage: Date
@@ -49,6 +56,6 @@ export interface GamifyDataReward {
 interface GamifyDataFile {
     version: number;
     tokenIcon: string;
-    rewards: GamifyDataReward[];
+    rewards: (GamifyDataRewardFolder | GamifyDataReward)[];
     userPoints: number;
 }
