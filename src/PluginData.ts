@@ -1,61 +1,68 @@
 import Gamify from "main";
+import { Model } from "./model/Model";
+import { Reward } from "./model/Reward";
+import { RewardFolder } from "./model/RewardFolder";
 
 export class GamifyData {
 
-    private instance: Gamify;
-
     readonly version: number = 1;
     tokenIcon: string = `⭐`;
-
+    private idSequence: number = 0;
     userPoints: number = 0;
 
-    rewards: (GamifyDataRewardFolder | GamifyDataReward)[] = [];
+    rewards: (Reward | RewardFolder)[] = [];
 
-    private constructor(instance: Gamify, data: GamifyDataFile) {
-        this.instance = instance;
+    private constructor(data: GamifyDataFile) {
         if (data?.version) this.version = data.version;
         if (data?.tokenIcon) this.tokenIcon = data.tokenIcon;
-        if (data?.rewards) this.rewards = data.rewards;
+        if (data?.rewards) this.rewards = data.rewards.map((r) => Model.rewardFactory(r));
         if (data?.userPoints) this.userPoints = data.userPoints;
+        if (data?.idSequence) this.idSequence = data.idSequence;
     }
 
-    static async load(plugin: Gamify): Promise<GamifyData> {
-        const data = await plugin.loadData();
-        return new GamifyData(plugin, data);
+    static async load(): Promise<GamifyData> {
+        const data = await Gamify.INSTANCE.loadData();
+        return new GamifyData(data);
     }
 
     async save(): Promise<void> {
         const data: GamifyDataFile = {
             version: this.version,
             tokenIcon: this.tokenIcon,
-            rewards: this.rewards,
-            userPoints: this.userPoints
+            rewards: this.rewards.map((r) => r.export()),
+            userPoints: this.userPoints,
+            idSequence: this.idSequence,
         }
-        await this.instance.saveData(data);
+        await Gamify.INSTANCE.saveData(data);
     }
 
+    get nextId(): number { return this.idSequence++; }
+
 }
 
-export interface GamifyDataRewardFolder {
+interface GamifyDataReward {
+    id: number;
     name: string;
-    icon: string | null;
-    contents: GamifyDataReward[];
+    icon: string | undefined;
+    last_usage: string;
 }
 
-export interface GamifyDataReward {
-    name: string;
-    icon: string | null;
+export interface GamifyDataRewardFolder extends GamifyDataReward {
+    contents: GamifyDataRewardObject[];
+}
+
+export interface GamifyDataRewardObject extends GamifyDataReward {
     description: string;
     points: number;
-    last_usage: Date
 }
 
 /**
  * This rappresents the data structure used to store the plugin data.
  */
-interface GamifyDataFile {
+export interface GamifyDataFile {
     version: number;
     tokenIcon: string;
-    rewards: (GamifyDataRewardFolder | GamifyDataReward)[];
+    rewards: (GamifyDataRewardFolder | GamifyDataRewardObject)[];
     userPoints: number;
+    idSequence: number;
 }

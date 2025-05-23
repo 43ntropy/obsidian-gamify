@@ -1,8 +1,9 @@
-import { App, Plugin } from 'obsidian';
-import { GamifyData } from 'src/PluginData';
-import { GamifySettings } from 'src/PluginSettings';
-import { UiDashboard } from 'src/ui/Dashboard';
-
+import { Plugin, App } from "obsidian";
+import { Reward } from "src/model/Reward";
+import { GamifyData } from "src/PluginData";
+import { GamifySettings } from "src/PluginSettings";
+import { GuiDashboard } from "src/ui/Dashboard";
+import { GuiRewardsStore } from "src/ui/RewardsStore";
 
 export default class Gamify extends Plugin {
 
@@ -14,14 +15,20 @@ export default class Gamify extends Plugin {
 
 		Gamify.INSTANCE = this;
 		Gamify.APP = this.app;
-		Gamify.DATA = await GamifyData.load(this);
+		Gamify.DATA = await GamifyData.load();
 		
 		this.addRibbonIcon('dice', 'Gamify', () => {
-			new UiDashboard();
+			new GuiRewardsStore();
 		});
 
 		this.addSettingTab(new GamifySettings());
-
+		
+		/*Gamify.DATA.rewards.push(Reward.create("Test", "🦐", "Test", 10));
+		Gamify.DATA.rewards.push(Reward.create("Test2", "🦐", "Test2", 20));
+		Gamify.DATA.rewards.push(Reward.create("Test3", "🦐", "Test3", 30));
+		Gamify.DATA.rewards.push(Reward.create("Test4", "🦐", "Test4", 40));
+		Gamify.DATA.rewards.push(Reward.create("Test5", "🦐", "Test5", 50));
+		Gamify.DATA.save();*/
 	}
 
 }

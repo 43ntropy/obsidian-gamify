@@ -1,8 +1,8 @@
 import Gamify from "main";
 import { Modal, Setting } from "obsidian";
-import { UiRewardsStore } from "./RewardsStore";
+import { GuiRewardsStore } from "./RewardsStore";
 
-export class UiDashboard extends Modal {
+export class GuiDashboard extends Modal {
 
     constructor() {
         super(Gamify.APP);
@@ -29,7 +29,7 @@ export class UiDashboard extends Modal {
                 btn.setCta();
                 btn.setTooltip(`Open rewards store`);
                 btn.onClick(async () => {
-                    new UiRewardsStore();
+                    new GuiRewardsStore();
                     this.close();
                 });
             })  
